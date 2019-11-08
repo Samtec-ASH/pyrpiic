@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3b90c6be81951ce846e8ce4ead67b488a9f4f96fe96e6185438a7f336009f599"
+            "sha256": "70a32f45fbc3a41bf3a516514a793f1aebeac4c4108d0a315d2c32b5c7976c02"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,6 +22,14 @@
             ],
             "index": "pypi",
             "version": "==1.1.0"
+        },
+        "pyrpio": {
+            "hashes": [
+                "sha256:e6004b9932f22dca70c5b88611fbbff09c7af3056aec6b099a9d273352724db8",
+                "sha256:ef945f2132aa087edb0d81822c1094b05fb8746a8f0dd8eb234a584e63df3986"
+            ],
+            "index": "pypi",
+            "version": "==0.0.3"
         }
     },
     "develop": {

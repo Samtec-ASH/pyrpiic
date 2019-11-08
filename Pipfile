@@ -14,6 +14,7 @@ v = {editable = true,version = "*"}
 
 [packages]
 bitarray = "*"
+pyrpio = "*"
 
 [requires]
 python_version = "3.7"
