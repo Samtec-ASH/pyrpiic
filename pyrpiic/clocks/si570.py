@@ -1,7 +1,9 @@
 import math
+
 from bitarray import bitarray
-from .utils import read_byte_data, write_i2c_block_data, write_byte_data
+
 from .defs import SI570Registers
+from .utils import read_byte_data, write_byte_data, write_i2c_block_data
 
 
 def freq2reg(freq_hz: float) -> SI570Registers:
