@@ -3,9 +3,10 @@ from bitarray import bitarray
 from .utils import read_byte_data, write_i2c_block_data, write_byte_data
 from .defs import SI570Registers
 
+
 def freq2reg(freq_hz: float) -> SI570Registers:
     regs = SI570Registers()
-    f_out = freq_hz # *1.0E6
+    f_out = freq_hz  # *1.0E6
     # Fixed values
     f_xtal = 114.285*1.0E6
     # Step 1: Assume f_dco = 5 GHz  (=f_xtal * f_req) to determine hs_div, n1
@@ -37,11 +38,13 @@ def freq2reg(freq_hz: float) -> SI570Registers:
         raise Exception("Frequency not achievable- Fdco must be 4.85-5.67 GHz")
     return regs
 
+
 def regs2freq(regs: SI570Registers) -> float:
     f_xtal = 114.285*1.0E6
     freq_hz = float(f_xtal*regs.f_req)/float(regs.hs_div*regs.n1)
     # freq_hz /= 1E6
     return freq_hz
+
 
 def set_registers(i2cbus, slave_addr, regs: SI570Registers, nonvolatile=False):
     # Binarize data
@@ -50,7 +53,7 @@ def set_registers(i2cbus, slave_addr, regs: SI570Registers, nonvolatile=False):
     #  Append all for 48 bits total]
     fxp_freq = int(regs.f_req*2.0**28)
     reg_data = bitarray(format(regs.hs_div-4, '03b') + format(regs.n1-1, '07b') + format(fxp_freq, '038b'))
-    regs_data = [int(reg_data[i:i+8].to01(),2) for i in range(0, len(reg_data), 8)]
+    regs_data = [int(reg_data[i:i+8].to01(), 2) for i in range(0, len(reg_data), 8)]
     try:
         # Read current registers
         resReg = read_byte_data(i2cbus, slave_addr, 135)
@@ -66,6 +69,7 @@ def set_registers(i2cbus, slave_addr, regs: SI570Registers, nonvolatile=False):
     except IOError:
         raise
 
+
 def get_registers(i2cbus, slave_addr, reg_addr=0x07):
     regs = SI570Registers()
     regs.reg_addr = reg_addr
@@ -79,18 +83,20 @@ def get_registers(i2cbus, slave_addr, reg_addr=0x07):
         raise
     # Extract values from data
     raw_bits = bitarray(''.join([format(b, '08b') for b in data_in]))
-    #First 3 bits hs, Next 7 bits N1, Following 38 bits Frequency
+    # First 3 bits hs, Next 7 bits N1, Following 38 bits Frequency
     regs.hs_div = int(raw_bits[:3].to01(), 2) + 4
     regs.n1 = int(raw_bits[3:10].to01(), 2) + 1
     fxp_f_req = int(raw_bits[10:].to01(), 2)
     regs.f_req = float(fxp_f_req)/(2.**28)
     return regs
 
-def set_frequency(i2cbus, slave_addr: int, freq_hz: float, reg_addr: int=0x07, nonvolatile=False):
+
+def set_frequency(i2cbus, slave_addr: int, freq_hz: float, reg_addr: int = 0x07, nonvolatile=False):
     regs = freq2reg(freq_hz)
     set_registers(i2cbus, slave_addr, regs, nonvolatile=nonvolatile)
 
-def get_frequency(i2cbus, slave_addr: int, reg_addr: int=0x07, nonvolatile=False):
+
+def get_frequency(i2cbus, slave_addr: int, reg_addr: int = 0x07, nonvolatile=False):
     regs = get_registers(i2cbus, slave_addr, reg_addr=reg_addr)
     freq_hz = regs2freq(regs)
     return freq_hz, regs

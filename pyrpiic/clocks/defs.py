@@ -2,15 +2,18 @@
 from dataclasses import dataclass
 from enum import Enum
 
+
 class ClockType(str, Enum):
     LMK61E2 = 'LMK61E2'
     SI570 = 'SI570'
+
 
 class LMK61E2ClockMode(int, Enum):
     TRISTATE = 0
     LVPECL = 1
     LVDS = 2
     HCSL = 3
+
 
 @dataclass
 class SI570Registers:

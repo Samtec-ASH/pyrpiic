@@ -1,9 +1,12 @@
-#%%
-import time
+# %%
 import math
+import time
+
 from bitarray import bitarray
-from .utils import read_byte_data, write_i2c_block_data, float2frac
-from .defs import LMK61E2Registers, LMK61E2ClockMode
+
+from .defs import LMK61E2ClockMode, LMK61E2Registers
+from .utils import float2frac, read_byte_data, write_i2c_block_data
+
 
 def get_registers(i2cbus, slave_addr: int) -> LMK61E2Registers:
     """" Read registers from device. """
@@ -39,6 +42,7 @@ def get_registers(i2cbus, slave_addr: int) -> LMK61E2Registers:
     regs.frac_den = int(raw_bits[66:88].to01(), 2)
     return regs
 
+
 def regs2freq(regs: LMK61E2Registers) -> float:
     """ Compute frequency (Hz) from registers. """
     # Compute target frequency
@@ -49,10 +53,11 @@ def regs2freq(regs: LMK61E2Registers) -> float:
     # freq /= 1.0E6 # Put in megahertz
     return freq_hz
 
+
 def freq2regs(freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2Registers:
     """ Compute registers from frequency (Hz). ODF is clock mode (2 = LVDS). """
     regs = LMK61E2Registers()
-    f_out = freq_hz # *1.0E6
+    f_out = freq_hz  # *1.0E6
     # Fixed values (Enable doubler by default)
     f_ref = 50.0*1.0E6
     regs.odf = LMK61E2ClockMode.LVDS.value
@@ -60,7 +65,7 @@ def freq2regs(freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2
     # Step 1: Assume f_vco is in middle and determine out_div
     f_vco_middle = 5.0*1E9
     regs.out_div = int(round(f_vco_middle/f_out, 0))
-    regs.out_div = max(min(regs.out_div, 511), 5) # [5, 511]
+    regs.out_div = max(min(regs.out_div, 511), 5)  # [5, 511]
     f_vco_desired = f_out * regs.out_div
     if f_vco_desired < 4.6E9 or f_vco_desired > 5.6E9:
         raise Exception('Frequency not achievable- Fvco must be in range [4.6 GHz, 5.6 GHz]')
@@ -92,15 +97,16 @@ def freq2regs(freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2
         regs.c3 = 1  # 3rd order filter enabled
     return regs
 
+
 def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=False):
     # Binarize data
-    reg_data = bitarray(format(regs.out_div, '016b')  + # (7-bit 0 w/  9-bit OUTDIV)
-                        format(0, '08b')         + # (Skip register 24)
-                        format(regs.int_div, '016b')  + # (4-bit 0 w/ 12-bit INT)
-                        format(regs.frac_num, '024b') + # (2-bit 0 w/ 22-bit NUM)
+    reg_data = bitarray(format(regs.out_div, '016b') +  # (7-bit 0 w/  9-bit OUTDIV)
+                        format(0, '08b') +  # (Skip register 24)
+                        format(regs.int_div, '016b') +  # (4-bit 0 w/ 12-bit INT)
+                        format(regs.frac_num, '024b') +  # (2-bit 0 w/ 22-bit NUM)
                         format(regs.frac_den, '024b'))  # (2-bit 0 w/ 22-bit DEN)
 
-    #Turn this into a byte array of bytes to send
+    # Turn this into a byte array of bytes to send
     regs_pll_data = [int(reg_data[i:i+8].to01(), 2) for i in range(0, len(reg_data), 8)]
 
     # Write to main block of registers
@@ -118,7 +124,7 @@ def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=F
 
     # Save register data to EEPROM (via SRAM)
     if nonvolatile:
-        write_i2c_block_data(i2cbus, slave_addr, 49, [0x50]) # Copy regs to sram
+        write_i2c_block_data(i2cbus, slave_addr, 49, [0x50])  # Copy regs to sram
         # Check register R49.6 bit to see when done (== 0)
         done = False
         while not done:
@@ -141,12 +147,12 @@ def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=F
 
 
 def set_frequency(i2cbus, slave_addr: int, freq_hz: float,
-                  odf: LMK61E2ClockMode=LMK61E2ClockMode.LVDS, nonvolatile: bool = False):
+                  odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS, nonvolatile: bool = False):
     regs = freq2regs(freq_hz, odf=odf)
     set_registers(i2cbus, slave_addr, regs, nonvolatile=nonvolatile)
+
 
 def get_frequency(i2cbus, slave_addr):
     regs = get_registers(i2cbus, slave_addr)
     freq = regs2freq(regs)
     return freq, regs
-
