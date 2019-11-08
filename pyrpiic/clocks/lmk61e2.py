@@ -6,6 +6,7 @@ from .utils import read_byte_data, write_i2c_block_data, float2frac
 from .defs import LMK61E2Registers, LMK61E2ClockMode
 
 def get_registers(i2cbus, slave_addr: int) -> LMK61E2Registers:
+    """" Read registers from device. """
     # Read registers
     data_in = bytearray()
     for i in range(11):
@@ -43,12 +44,12 @@ def regs2freq(regs: LMK61E2Registers) -> float:
     # Compute target frequency
     f_ref = 50.0*1E6
     frac_float = regs.frac_num/regs.frac_den if (regs.frac_den > 0 and regs.meo > 0) else 0
-    freq_hz = f_ref*(2*regs.pll_d)*( regs.int_div + frac_float )
+    freq_hz = f_ref*(2*regs.pll_d)*(regs.int_div + frac_float)
     freq_hz = freq_hz / regs.out_div
     # freq /= 1.0E6 # Put in megahertz
     return freq_hz
 
-def freq2regs(freq_hz, odf:LMK61E2ClockMode=LMK61E2ClockMode.LVDS) -> LMK61E2Registers:
+def freq2regs(freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2Registers:
     """ Compute registers from frequency (Hz). ODF is clock mode (2 = LVDS). """
     regs = LMK61E2Registers()
     f_out = freq_hz # *1.0E6
@@ -75,7 +76,7 @@ def freq2regs(freq_hz, odf:LMK61E2ClockMode=LMK61E2ClockMode.LVDS) -> LMK61E2Reg
         regs.dmc = 3  # Disabled
         regs.meo = 0  # Integer mode
         regs.cp = 8  # 6.4 mA
-        # TODO: 3rd order filter should be ENABLED when doubler is enabled.
+        # NOTE: 3rd order filter should be ENABLED when doubler is enabled.
         # However, chip default has it disabled for int mode w/ doubler enabled
         # c3 = 1 if regs.pll_d is 1 else 0
         regs.c3 = 0
@@ -100,7 +101,7 @@ def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=F
                         format(regs.frac_den, '024b'))  # (2-bit 0 w/ 22-bit DEN)
 
     #Turn this into a byte array of bytes to send
-    regs_pll_data = [int(reg_data[i:i+8].to01(),2) for i in range(0, len(reg_data), 8)]
+    regs_pll_data = [int(reg_data[i:i+8].to01(), 2) for i in range(0, len(reg_data), 8)]
 
     # Write to main block of registers
     write_i2c_block_data(i2cbus, slave_addr, 22, regs_pll_data)
@@ -139,7 +140,8 @@ def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=F
         write_i2c_block_data(i2cbus, slave_addr, 56, [0x00])
 
 
-def set_frequency(i2cbus, slave_addr: int, freq_hz: float, odf:LMK61E2ClockMode=LMK61E2ClockMode.LVDS, nonvolatile: bool=False):
+def set_frequency(i2cbus, slave_addr: int, freq_hz: float,
+                  odf: LMK61E2ClockMode=LMK61E2ClockMode.LVDS, nonvolatile: bool = False):
     regs = freq2regs(freq_hz, odf=odf)
     set_registers(i2cbus, slave_addr, regs, nonvolatile=nonvolatile)
 

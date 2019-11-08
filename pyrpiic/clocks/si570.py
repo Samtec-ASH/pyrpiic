@@ -86,11 +86,11 @@ def get_registers(i2cbus, slave_addr, reg_addr=0x07):
     regs.f_req = float(fxp_f_req)/(2.**28)
     return regs
 
-def set_frequency(i2cbus, slave_addr: int, freq_hz: float, reg_addr: int=x07, nonvolatile=False):
+def set_frequency(i2cbus, slave_addr: int, freq_hz: float, reg_addr: int=0x07, nonvolatile=False):
     regs = freq2reg(freq_hz)
     set_registers(i2cbus, slave_addr, regs, nonvolatile=nonvolatile)
 
-def get_frequency(i2cbus, slave_addr: int, reg_addr: int=x07, nonvolatile=False):
+def get_frequency(i2cbus, slave_addr: int, reg_addr: int=0x07, nonvolatile=False):
     regs = get_registers(i2cbus, slave_addr, reg_addr=reg_addr)
     freq_hz = regs2freq(regs)
     return freq_hz, regs

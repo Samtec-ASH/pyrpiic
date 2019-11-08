@@ -1,4 +1,4 @@
-from typing import List, Union
+""" clock dataclass definitions """
 from dataclasses import dataclass
 from enum import Enum
 

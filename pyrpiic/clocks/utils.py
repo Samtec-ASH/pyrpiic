@@ -12,7 +12,7 @@ def write_byte_data(i2cbus, slave_addr, reg_addr, reg_value):
     data = [I2C.Message([reg_addr, reg_value])]
     i2cbus.transfer(slave_addr, data)
 
-def write_i2c_block_data(i2cbus: int, slave_addr: int, reg_addr, block_data: Union[bytearray,List,bytes]):
+def write_i2c_block_data(i2cbus: int, slave_addr: int, reg_addr, block_data: Union[bytearray, List, bytes]):
     for i,v in enumerate(block_data):
         write_byte_data(i2cbus, slave_addr, reg_addr+i, v)
 
