@@ -1,0 +1,1 @@
+from .eeprom import EEPROM

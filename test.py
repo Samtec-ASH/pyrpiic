@@ -1,23 +1,23 @@
-import random
-import time
-
+import json
 from pyrpio.i2c import I2C
+
+from pyrpiic.eeprom import EEPROM
 
 i2c = I2C('/dev/i2c-3')
 
 i2c.open()
 
-i2c.set_address(0x70)
 
-i2c.write(0x1.to_bytes(length=1, byteorder='big'))
+eeprom = EEPROM(bus=i2c, address=0x57)
 
+print(eeprom.write_sequential_bytes(0x0, bytes(256)))
 
-i2c.set_address(0x57)
+test = dict(val=2, cool=4, test='ç‡Ó\0dsf', me=dict(nathan=True))
 
-print(i2c.read_register_sequential(0x0, 10))
+x = json.dumps(test)
 
-time.sleep(0)
-# i2c.write_register(0x0, 0x10)
-i2c.write_register_sequential(0xF, [0xF] * 16)
-time.sleep(0.1)
-print(i2c.read_register_sequential(0x0, 256))
+eeprom.write_string(0x0, x)
+
+print(eeprom.read_sequential_bytes(0x0, 256))
+
+print(json.loads(eeprom.read_string(0x0)))
