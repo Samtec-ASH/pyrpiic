@@ -1,10 +1,11 @@
 import pytest
-from pyrpio.i2c import I2C
 
-from .eeprom import EEPROM
+from pyrpiic.eeprom import EEPROM
+from pyrpiic.eeprom.tests.fake_i2c import I2C
 
 bus = I2C('/dev/i2c-3')
 bus.open()
+bus.configure_eeprom(0x57, 16, 1, 16)
 eeprom = EEPROM(bus, 0x57)
 
 
@@ -18,7 +19,7 @@ def test_eeprom_clear():
 
 def test_eeprom_write():
     eeprom.write_string(0x0, 'hello world how is it'*10)
-    assert eeprom.read_string(0x0) == 'hello world how is it' * 10
+    assert eeprom.read_string(0x0) == 'hello world how is it'*10
 
 
 def test_eeprom_write_null_character():
