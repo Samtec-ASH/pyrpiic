@@ -7,6 +7,7 @@ from .utils import read_byte_data, write_byte_data, write_i2c_block_data
 
 
 def freq2reg(freq_hz: float) -> SI570Registers:
+    """ Convert frequency to register dataclass """
     regs = SI570Registers()
     f_out = freq_hz  # *1.0E6
     # Fixed values
@@ -30,7 +31,7 @@ def freq2reg(freq_hz: float) -> SI570Registers:
         #  if
     #  for
     regs.hs_div = min_hs_div
-    regs.n1 = min_n1
+    regs.n1 = int(min_n1)
     if not found:
         raise Exception("Frequency not achievable- Fdco must be 4.85-5.67 GHz")
     # Step 2: Determine f_dco and therefore f_req
@@ -42,6 +43,7 @@ def freq2reg(freq_hz: float) -> SI570Registers:
 
 
 def regs2freq(regs: SI570Registers) -> float:
+    """ Convert register dataclass to frequency """
     f_xtal = 114.285*1.0E6
     freq_hz = float(f_xtal*regs.f_req)/float(regs.hs_div*regs.n1)
     # freq_hz /= 1E6
@@ -49,6 +51,7 @@ def regs2freq(regs: SI570Registers) -> float:
 
 
 def set_registers(i2cbus, slave_addr, regs: SI570Registers, nonvolatile=False):
+    """ Writes registers to clock IC """
     # Binarize data
     #  First 3 bits hs, Next 7 bits N1,
     #  Following 38 bits Frequency (freq is in 10.28 fixed-point format)
@@ -56,23 +59,21 @@ def set_registers(i2cbus, slave_addr, regs: SI570Registers, nonvolatile=False):
     fxp_freq = int(regs.f_req*2.0**28)
     reg_data = bitarray(format(regs.hs_div-4, '03b') + format(regs.n1-1, '07b') + format(fxp_freq, '038b'))
     regs_data = [int(reg_data[i:i+8].to01(), 2) for i in range(0, len(reg_data), 8)]
-    try:
-        # Read current registers
-        resReg = read_byte_data(i2cbus, slave_addr, 135)
-        frzReg = read_byte_data(i2cbus, slave_addr, 137)
-        # Freeze DCO
-        write_byte_data(i2cbus, slave_addr, 137, frzReg ^ 0x10)
-        # Write to all registers (No need to chunk since less than 8)
-        i2cbus.write_i2c_block_data(slave_addr, regs.reg_addr, regs_data)
-        # Unfreeze DCO
-        write_byte_data(i2cbus, slave_addr, 137, frzReg & 0xEF)
-        # Set NewFreq - New Frequency bit
-        write_byte_data(i2cbus, slave_addr, 135, resReg ^ 0x40)
-    except IOError:
-        raise
+    # Read current registers
+    resReg = read_byte_data(i2cbus, slave_addr, 135)
+    frzReg = read_byte_data(i2cbus, slave_addr, 137)
+    # Freeze DCO
+    write_byte_data(i2cbus, slave_addr, 137, frzReg ^ 0x10)
+    # Write to all registers (No need to chunk since less than 8)
+    i2cbus.write_i2c_block_data(slave_addr, regs.reg_addr, regs_data)
+    # Unfreeze DCO
+    write_byte_data(i2cbus, slave_addr, 137, frzReg & 0xEF)
+    # Set NewFreq - New Frequency bit
+    write_byte_data(i2cbus, slave_addr, 135, resReg ^ 0x40)
 
 
 def get_registers(i2cbus, slave_addr, reg_addr=0x07):
+    """ Read registers from clock IC """
     regs = SI570Registers()
     regs.reg_addr = reg_addr
     # Read raw bytes from registers
@@ -94,11 +95,13 @@ def get_registers(i2cbus, slave_addr, reg_addr=0x07):
 
 
 def set_frequency(i2cbus, slave_addr: int, freq_hz: float, reg_addr: int = 0x07, nonvolatile=False):
+    """ Set clock IC to target frequency """
     regs = freq2reg(freq_hz)
     set_registers(i2cbus, slave_addr, regs, nonvolatile=nonvolatile)
 
 
 def get_frequency(i2cbus, slave_addr: int, reg_addr: int = 0x07, nonvolatile=False):
+    """ Get frequency from clock IC """
     regs = get_registers(i2cbus, slave_addr, reg_addr=reg_addr)
     freq_hz = regs2freq(regs)
     return freq_hz, regs

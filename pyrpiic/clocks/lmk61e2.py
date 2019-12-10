@@ -47,7 +47,9 @@ def regs2freq(regs: LMK61E2Registers) -> float:
     """ Compute frequency (Hz) from registers. """
     # Compute target frequency
     f_ref = 50.0*1E6
-    frac_float = regs.frac_num/regs.frac_den if (regs.frac_den > 0 and regs.meo > 0) else 0
+    frac_float = 0
+    if regs.frac_den > 0 and regs.meo > 0:
+        frac_float = regs.frac_num / regs.frac_den
     freq_hz = f_ref*(2*regs.pll_d)*(regs.int_div + frac_float)
     freq_hz = freq_hz / regs.out_div
     # freq /= 1.0E6 # Put in megahertz
@@ -100,12 +102,13 @@ def freq2regs(freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2
 
 def set_registers(i2cbus, slave_addr: int, regs: LMK61E2Registers, nonvolatile=False):
     # Binarize data
-    reg_data = bitarray(format(regs.out_div, '016b') +  # (7-bit 0 w/  9-bit OUTDIV)
-                        format(0, '08b') +  # (Skip register 24)
-                        format(regs.int_div, '016b') +  # (4-bit 0 w/ 12-bit INT)
-                        format(regs.frac_num, '024b') +  # (2-bit 0 w/ 22-bit NUM)
-                        format(regs.frac_den, '024b'))  # (2-bit 0 w/ 22-bit DEN)
-
+    reg_data = bitarray(
+        format(regs.out_div, '016b') +  # (7-bit 0 w/  9-bit OUTDIV)
+        format(0, '08b') +  # (Skip register 24)
+        format(regs.int_div, '016b') +  # (4-bit 0 w/ 12-bit INT)
+        format(regs.frac_num, '024b') +  # (2-bit 0 w/ 22-bit NUM)
+        format(regs.frac_den, '024b')  # (2-bit 0 w/ 22-bit DEN)
+    )
     # Turn this into a byte array of bytes to send
     regs_pll_data = [int(reg_data[i:i+8].to01(), 2) for i in range(0, len(reg_data), 8)]
 

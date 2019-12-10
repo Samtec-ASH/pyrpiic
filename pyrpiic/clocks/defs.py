@@ -19,7 +19,7 @@ class LMK61E2ClockMode(int, Enum):
 class SI570Registers:
     hs_div: int = 0
     n1: int = 0
-    f_req: int = 0
+    f_req: float = 0
     reg_addr: int = 0x07
 
 
