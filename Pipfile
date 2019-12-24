@@ -10,6 +10,8 @@ pytest = "*"
 pylint = "*"
 autopep8 = "*"
 python-periphery = "*"
+pyrpiic = {path = "."}
+v = {editable = true,version = "*"}
 
 [packages]
 bitarray = "*"

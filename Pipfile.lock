@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "93183d52a0722f074da4f233482c7b688e43c7bb4a17263931c75d8e66a1a574"
+            "sha256": "660f8c9cecf5d7d79c1a87a2545d672af9394ba86277733a3a10d7e4b98ee0ea"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -25,8 +25,7 @@
         },
         "pyrpio": {
             "hashes": [
-                "sha256:4cc2ea16b0f34ed75ee2311c98bd787bb5632bb4d2c23df8ab3c508815d7b5ad",
-                "sha256:5f2d0a1a75a73120782a59961015fffa1edaab531fe30632f7098d2a727a4f74"
+                "sha256:4cc2ea16b0f34ed75ee2311c98bd787bb5632bb4d2c23df8ab3c508815d7b5ad"
             ],
             "index": "pypi",
             "version": "==0.0.4"
@@ -209,6 +208,9 @@
             ],
             "version": "==2.4.5"
         },
+        "pyrpiic": {
+            "path": "."
+        },
         "pytest": {
             "hashes": [
                 "sha256:6b571215b5a790f9b41f19f3531c53a45cf6bb8ef2988bc1ff9afb38270b25fa",
@@ -300,6 +302,14 @@
                 "sha256:f3c5fd51747d450d4dcf6f923c81f78f811aab8205fda64b0aba34a4e48b0745"
             ],
             "version": "==1.25.7"
+        },
+        "v": {
+            "hashes": [
+                "sha256:2d5a8f79a36aaebe62ef2c7068e3ec7f86656078202edabfdbf74715dc822d36",
+                "sha256:cd6b6b20b4a611f209c88bcdfb7211321f85662efb2bdd53a7b40314d0a84618"
+            ],
+            "index": "pypi",
+            "version": "==0.0.0"
         },
         "wcwidth": {
             "hashes": [

@@ -2,11 +2,12 @@ import math
 
 
 def float2frac(x, error=1e-9):
+    ''' float to fraction (numerator / denominator). '''
     n = int(math.floor(x))
     x -= n
     if x < error:
         return (n, 1)
-    elif 1 - error < x:
+    if 1 - error < x:
         return (n+1, 1)
 
     # The lower fraction is 0/1
