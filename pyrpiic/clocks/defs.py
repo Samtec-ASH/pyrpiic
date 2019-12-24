@@ -35,4 +35,4 @@ class LMK61E2Registers:
     frac_den: int = 1
     int_div: int = 0
     out_div: int = 1
-    odf: int = LMK61E2ClockMode
+    odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS
