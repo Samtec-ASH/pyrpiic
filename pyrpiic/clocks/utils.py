@@ -1,23 +1,4 @@
-import json
 import math
-import os
-from typing import List, Union
-
-
-def read_byte_data(i2cbus, slave_addr, reg_addr):
-    data = [I2C.Message([reg_addr]), I2C.Message([0x00], read=True)]
-    i2cbus.transfer(slave_addr, data)
-    return data[1].data[0]
-
-
-def write_byte_data(i2cbus, slave_addr, reg_addr, reg_value):
-    data = [I2C.Message([reg_addr, reg_value])]
-    i2cbus.transfer(slave_addr, data)
-
-
-def write_i2c_block_data(i2cbus: int, slave_addr: int, reg_addr, block_data: Union[bytearray, List, bytes]):
-    for i, v in enumerate(block_data):
-        write_byte_data(i2cbus, slave_addr, reg_addr+i, v)
 
 
 def float2frac(x, error=1e-9):
