@@ -62,7 +62,7 @@ class LDC1X1Y:
 
     def close(self):
         ''' Close up access. '''
-        pass
+        return 0
 
     def __enter__(self):
         return self

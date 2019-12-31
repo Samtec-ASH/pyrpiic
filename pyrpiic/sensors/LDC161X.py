@@ -1,3 +1,4 @@
+from typing import Tuple
 from pyrpiic.sensors.LDC1X1Y import LDC1X1Y
 
 
