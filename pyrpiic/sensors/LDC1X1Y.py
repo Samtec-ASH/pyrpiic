@@ -94,7 +94,7 @@ class LDC1X1Y:
         ''' Set single bit of register. '''
         mask = 1 << bit
         pvalue = self.get_register(register, ~mask)
-        self.set_register(register, pvalue | (int(on) & mask))
+        self.set_register(register, pvalue | (int(on) << bit))
 
     def get_manufacturer_id(self) -> int:
         ''' Get manufacturer ID. '''
@@ -200,7 +200,7 @@ class LDC1X1Y:
             ƒREF_DIV ≥ 0x001:
             ƒREF0 = ƒCLK/ƒREF_DIV
         '''
-        value = ((fin_dev & 0x000F) << 12) & (fref_dev & 0x03FF)
+        value = ((fin_dev & 0x000F) << 12) | (fref_dev & 0x03FF)
         self.set_register(self.LDC1X1Y_CLOCK_DIVIDERS_BASE + ch, value)
 
     def get_status_errors(self):
@@ -227,73 +227,73 @@ class LDC1X1Y:
             b1: The LDC will drive channel 0 with current >1.5mA.
             NOTE: This mode is not supported if AUTOSCAN_EN = b1 (multi-channel mode).
         '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 6)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 6)
 
     @high_current_drive.setter
     def high_current_drive(self, enable: bool):
-        self.set_register_bit(self.LDC1X1Y_STATUS, 6, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 6, enable)
 
     @property
     def status_update_interrupt_enable(self):
         ''' Enables status updates triggering interrupt pin. '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 7)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 7)
 
     @status_update_interrupt_enable.setter
     def status_update_interrupt_enable(self, enable: bool):
         ''' Enable/disable status updates triggering interrupt pin. '''
-        self.set_register_bit(self.LDC1X1Y_STATUS, 7, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 7, enable)
 
     @property
     def reference_clock_external(self):
         ''' Enable external reference clock instead of internal oscillator. '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 9)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 9)
 
     @reference_clock_external.setter
     def reference_clock_external(self, enable: bool):
         ''' Enable external reference clock or use internal oscillator. '''
-        self.set_register_bit(self.LDC1X1Y_STATUS, 9, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 9, enable)
 
     @property
     def automatic_amplitude_correction(self):
         ''' Use automatic amplitude correction.
             NOTE: Disable automatic correction for high precision applications.
         '''
-        return not self.get_register_bit(self.LDC1X1Y_STATUS, 10)
+        return not self.get_register_bit(self.LDC1X1Y_CONFIG, 10)
 
     @automatic_amplitude_correction.setter
     def automatic_amplitude_correction(self, enable: bool):
-        return self.set_register_bit(self.LDC1X1Y_STATUS, 10, not enable)
+        return self.set_register_bit(self.LDC1X1Y_CONFIG, 10, not enable)
 
     @property
     def low_power_activation_mode(self):
         ''' Use low power sense mode- the LDC uses the value programmed in
             DRIVE_CURRENTx during sensor activation to minimize power consumption.
         '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 11)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 11)
 
     @low_power_activation_mode.setter
     def low_power_activation_mode(self, enable: bool):
-        self.set_register_bit(self.LDC1X1Y_STATUS, 11, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 11, enable)
 
     @property
     def current_override_enable(self):
         ''' Provides control over sensor current drive used during the conversion time
             for Ch. x, based on the programmed value in the IDRIVEx field
         '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 12)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 12)
 
     @current_override_enable.setter
     def current_override_enable(self, enable: bool):
-        self.set_register_bit(self.LDC1X1Y_STATUS, 12, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 12, enable)
 
     @property
     def sleep_mode(self):
         ''' Sleep mode or active mode. '''
-        return self.get_register_bit(self.LDC1X1Y_STATUS, 13)
+        return self.get_register_bit(self.LDC1X1Y_CONFIG, 13)
 
     @sleep_mode.setter
     def sleep_mode(self, enable: bool):
-        self.set_register_bit(self.LDC1X1Y_STATUS, 13, enable)
+        self.set_register_bit(self.LDC1X1Y_CONFIG, 13, enable)
 
     @property
     def data_ready(self):
@@ -302,7 +302,7 @@ class LDC1X1Y:
             is available. When in sequential mode, this indicates that a new
             conversion result for all active channels is now available.
         '''
-        reg = self.get_register(self.LDC1X1Y_STATUS)
+        reg = self.get_register_bit(self.LDC1X1Y_STATUS, 6)
         return bool(reg & 0x0040)
 
     def channel_data_ready(self, ch: int):
