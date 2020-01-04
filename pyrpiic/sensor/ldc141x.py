@@ -1,5 +1,5 @@
 from typing import Tuple
-from pyrpiic.sensors.ldc1x1y import LDC1X1Y
+from pyrpiic.sensor.ldc1x1y import LDC1X1Y
 
 
 class LDC141X(LDC1X1Y):

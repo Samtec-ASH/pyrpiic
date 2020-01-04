@@ -15,15 +15,15 @@
 
 Install the latest from PyPi:
 
-> `pip install pyrpiic`
+`pip install pyrpiic`
 
 _-OR-_ using **pipenv**:
 
-> `pipenv install pyrpiic`
+`pipenv install pyrpiic`
 
 Install from source:
 
-> `python3 setup.py install`
+`python3 setup.py install`
 
 # Modules
 
@@ -34,11 +34,19 @@ Install from source:
 
 ## EEPROMs
 
-TODO
+- Generic
+- M24C02
 
 ## I2C-GPIO Expanders
 
-TODO
+- TCA6416A
+
+## Sensors
+
+- LDC1412
+- LDC1414
+- LDC1612
+- LDC1614
 
 # Examples
 
@@ -49,14 +57,19 @@ TODO
 from pyrpio.i2c import I2C
 from pyrpiic.clock import LMK612
 
-i2c_addr = 0x5A
-i2c_bus = I2C('dev/i2c-3')
+# Create and open I2C bus
+i2c_bus = I2C('/dev/i2c-3')
 i2c_bus.open()
-clock = LMK612(i2c_bus, i2c_addr)
 
+# Create clock
+clock = LMK612(i2c_bus, 0x5A)
+
+# Perform various clock operations
 clock.set_frequency(156_250_000)
 freq, regs = clock.get_frequency()
 clock.regs2freq(regs)
 clock.set_registers(regs)
+
+# Close I2C bus
 i2c_bus.close()
 ```
