@@ -2,7 +2,7 @@
 
 [MESSAGES CONTROL]
 
-disable=invalid-name,unused-argument,too-many-branches,too-many-locals,too-many-arguments,too-many-instance-attributes,broad-except,missing-class-docstring,missing-module-docstring,no-self-use,too-many-public-methods
+disable=invalid-name,unused-argument,too-many-branches,too-many-locals,too-many-arguments,too-many-instance-attributes,broad-except,missing-class-docstring,missing-module-docstring,no-self-use,too-many-public-methods,duplicate-code
 
 [FORMAT]
 max-line-length=120

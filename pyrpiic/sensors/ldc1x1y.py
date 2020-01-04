@@ -302,8 +302,7 @@ class LDC1X1Y:
             is available. When in sequential mode, this indicates that a new
             conversion result for all active channels is now available.
         '''
-        reg = self.get_register_bit(self.LDC1X1Y_STATUS, 6)
-        return bool(reg & 0x0040)
+        return self.get_register_bit(self.LDC1X1Y_STATUS, 6)
 
     def channel_data_ready(self, ch: int):
         ''' New channel conversion result is ready. '''
