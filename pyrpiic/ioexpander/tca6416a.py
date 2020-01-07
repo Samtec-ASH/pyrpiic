@@ -95,13 +95,19 @@ class TCA6416A:
         value = gpio_dir == GPIODir.IN
         self.set_register_bit(self.TCA6416A_BASE_CONFIG + port_index, gpio_bit, value)
 
-    def read_gpio_value(self, gpio: str):
+    def get_gpio_input(self, gpio: str) -> bool:
         ''' Read GPIO input value.'''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         return self.get_register_bit(self.TCA6416A_BASE_INPUT + port_index, gpio_bit)
 
-    def write_gpio_value(self, gpio: str, high: Union[bool, int]):
+    def get_gpio_output(self, gpio: str) -> bool:
+        ''' Get currently set GPIO output value.'''
+        port_index = self.get_port_index(gpio)
+        gpio_bit = self.get_gpio_bit_position(gpio)
+        return self.get_register_bit(self.TCA6416A_BASE_OUTPUT + port_index, gpio_bit)
+
+    def set_gpio_output(self, gpio: str, high: Union[bool, int]):
         ''' Pull GPIO output either active high or low.'''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)

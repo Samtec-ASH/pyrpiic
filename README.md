@@ -55,20 +55,47 @@ Install from source:
 ```python
 
 from pyrpio.i2c import I2C
-from pyrpiic.clock import LMK612
+from pyrpiic.clock.lmk61e2 import LMK61E2
 
 # Create and open I2C bus
 i2c_bus = I2C('/dev/i2c-3')
 i2c_bus.open()
 
 # Create clock
-clock = LMK612(i2c_bus, 0x5A)
+clock = LMK61E2(i2c_bus, 0x5A)
 
 # Perform various clock operations
 clock.set_frequency(156_250_000)
 freq, regs = clock.get_frequency()
 clock.regs2freq(regs)
 clock.set_registers(regs)
+
+# Close I2C bus
+i2c_bus.close()
+```
+
+## I2C-GPIO Expanders
+
+```python
+
+from pyrpio.i2c import I2C
+from pyrpiic.ioexpander.tca6416a import TCA6416A
+
+# Create and open I2C bus
+i2c_bus = I2C('/dev/i2c-3')
+i2c_bus.open()
+
+# Create gpio expander
+gpio_exp = TCA6416A(i2c3, 0x21)
+
+# Set GPIO P00 as output pulled high
+gpio_exp.set_gpio_direction('P00', 'OUT')
+gpio_exp.set_gpio_output('P00', high=True)
+
+# Set GPIO P01 as input w/ flipped polarity and read value
+gpio_exp.set_gpio_direction('P01', 'IN')
+gpio_exp.set_gpio_polarity('P01', flipped=True)
+gpio_exp.get_gpio_input('P01')
 
 # Close I2C bus
 i2c_bus.close()

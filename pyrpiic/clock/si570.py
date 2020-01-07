@@ -8,12 +8,12 @@ from .defs import SI570Registers
 
 class SI570:
 
-    def __init__(self, bus: I2C, slave_addr: int):
-        self.slave_addr = slave_addr
-        self.i2c_reg = I2CRegisterDevice(bus, slave_addr, register_size=1, data_size=1)
+    def __init__(self, bus: I2C, address: int):
+        self.address = address
+        self.i2c_reg = I2CRegisterDevice(bus, address, register_size=1, data_size=1)
 
     def get_registers(self, reg_addr: Optional[int] = 0x07):
-        """ Read registers from clock IC """
+        ''' Read registers from clock IC '''
         regs = SI570Registers()
         if reg_addr is not None:
             regs.reg_addr = reg_addr
@@ -32,7 +32,7 @@ class SI570:
         return regs
 
     def freq2reg(self, freq_hz: float) -> SI570Registers:
-        """ Convert frequency to register dataclass """
+        ''' Convert frequency to register dataclass '''
         regs = SI570Registers()
         f_out = freq_hz  # *1.0E6
         # Fixed values
@@ -67,14 +67,14 @@ class SI570:
         return regs
 
     def regs2freq(self, regs: SI570Registers) -> float:
-        """ Convert register dataclass to frequency """
+        ''' Convert register dataclass to frequency '''
         f_xtal = 114.285*1.0E6
         freq_hz = float(f_xtal*regs.f_req)/float(regs.hs_div*regs.n1)
         # freq_hz /= 1E6
         return freq_hz
 
     def set_registers(self, regs: SI570Registers, nonvolatile=False):
-        """ Writes registers to clock IC """
+        ''' Writes registers to clock IC '''
         # Binarize data
         #  First 3 bits hs, Next 7 bits N1,
         #  Following 38 bits Frequency (freq is in 10.28 fixed-point format)
@@ -96,12 +96,12 @@ class SI570:
         self.i2c_reg.write_register(135, res_reg ^ 0x40)
 
     def set_frequency(self, freq_hz: float, reg_addr: int = 0x07, nonvolatile=False):
-        """ Set clock IC to target frequency """
+        ''' Set clock IC to target frequency '''
         regs = self.freq2reg(freq_hz)
         self.set_registers(regs, nonvolatile=nonvolatile)
 
     def get_frequency(self, reg_addr: Optional[int] = 0x07):
-        """ Get frequency from clock IC """
+        ''' Get frequency from clock IC '''
         regs = self.get_registers(reg_addr=reg_addr)
         freq_hz = self.regs2freq(regs)
         return freq_hz, regs

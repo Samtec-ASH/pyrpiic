@@ -8,14 +8,14 @@ from .defs import LMK61E2ClockMode, LMK61E2Registers
 from .utils import float2frac
 
 
-class LMK612:
+class LMK61E2:
 
-    def __init__(self, bus: I2C, slave_addr: int):
-        self.slave_addr = slave_addr
-        self.i2c_reg = I2CRegisterDevice(bus, slave_addr, register_size=1, data_size=1)
+    def __init__(self, bus: I2C, address: int):
+        self.address = address
+        self.i2c_reg = I2CRegisterDevice(bus, address, register_size=1, data_size=1)
 
     def get_registers(self) -> LMK61E2Registers:
-        """" Read registers from device. """
+        ''' Read registers from device. '''
         # Read registers
         data_in = bytearray()
         for i in range(11):
@@ -49,7 +49,7 @@ class LMK612:
         return regs
 
     def regs2freq(self, regs: LMK61E2Registers) -> float:
-        """ Compute frequency (Hz) from registers. """
+        ''' Compute frequency (Hz) from registers. '''
         # Compute target frequency
         f_ref = 50.0*1E6
         frac_float = 0
@@ -60,7 +60,7 @@ class LMK612:
         return freq_hz
 
     def freq2regs(self, freq_hz, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS) -> LMK61E2Registers:
-        """ Compute registers from frequency (Hz). ODF is clock mode (2 = LVDS). """
+        ''' Compute registers from frequency (Hz). ODF is clock mode (2 = LVDS). '''
         regs = LMK61E2Registers()
         f_out = freq_hz  # *1.0E6
         # Fixed values (Enable doubler by default)
@@ -103,7 +103,7 @@ class LMK612:
         return regs
 
     def set_registers(self, regs: LMK61E2Registers, nonvolatile=False):
-        """ Writes registers to clock IC """
+        ''' Writes registers to clock IC '''
         # Binarize data
         reg_data = bitarray(
             format(regs.out_div, '016b') +  # (7-bit 0 w/  9-bit OUTDIV)
@@ -153,12 +153,12 @@ class LMK612:
 
     def set_frequency(self, freq_hz: float, odf: LMK61E2ClockMode = LMK61E2ClockMode.LVDS,
                       nonvolatile: bool = False, **kwargs):
-        """ Set clock IC to target frequency """
+        ''' Set clock IC to target frequency '''
         regs = self.freq2regs(freq_hz, odf=odf)
         self.set_registers(regs, nonvolatile=nonvolatile)
 
     def get_frequency(self):
-        """ Get frequency from clock IC """
+        ''' Get frequency from clock IC '''
         regs = self.get_registers()
         freq = self.regs2freq(regs)
         return freq, regs
