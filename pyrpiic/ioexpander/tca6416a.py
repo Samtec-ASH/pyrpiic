@@ -81,7 +81,7 @@ class TCA6416A:
             return TCA6416A.PORT1.index(gpio)
         raise ValueError(f'GPIO {gpio} is not a valid value')
 
-    def get_gpio_direction(self, gpio: str, gpio_dir: GPIODir):
+    def get_gpio_direction(self, gpio: str):
         ''' Get GPIO direction as either in or out. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
