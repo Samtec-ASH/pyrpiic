@@ -10,11 +10,11 @@ class GPIODir(str, Enum):
 
 
 class PCA9698:
-    PORT0 = ['IO0_0''IO0_1''IO0_2''IO0_3''IO0_4''IO0_5''IO0_6''IO0_7']
-    PORT1 = ['IO1_0''IO1_1''IO1_2''IO1_3''IO1_4''IO1_5''IO1_6''IO1_7']
-    PORT2 = ['IO2_0''IO2_1''IO2_2''IO2_3''IO2_4''IO2_5''IO2_6''IO2_7']
-    PORT3 = ['IO3_0''IO3_1''IO3_2''IO3_3''IO3_4''IO3_5''IO3_6''IO3_7']
-    PORT4 = ['IO4_0''IO4_1''IO4_2''IO4_3''IO4_4''IO4_5''IO4_6''IO4_7']
+    PORT0 = ['IO0_0','IO0_1','IO0_2','IO0_3','IO0_4','IO0_5','IO0_6','IO0_7']
+    PORT1 = ['IO1_0','IO1_1','IO1_2','IO1_3','IO1_4','IO1_5','IO1_6','IO1_7']
+    PORT2 = ['IO2_0','IO2_1','IO2_2','IO2_3','IO2_4','IO2_5','IO2_6','IO2_7']
+    PORT3 = ['IO3_0','IO3_1','IO3_2','IO3_3','IO3_4','IO3_5','IO3_6','IO3_7']
+    PORT4 = ['IO4_0','IO4_1','IO4_2','IO4_3','IO4_4','IO4_5','IO4_6','IO4_7']
     PCA9698_BASE_INPUT = 0x00
     PCA9698_PORT0_INPUT = 0x00
     PCA9698_PORT1_INPUT = 0x01
