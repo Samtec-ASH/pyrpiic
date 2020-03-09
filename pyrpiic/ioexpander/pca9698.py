@@ -10,11 +10,11 @@ class GPIODir(str, Enum):
 
 
 class PCA9698:
-    PORT0 = ['IO0_0','IO0_1','IO0_2','IO0_3','IO0_4','IO0_5','IO0_6','IO0_7']
-    PORT1 = ['IO1_0','IO1_1','IO1_2','IO1_3','IO1_4','IO1_5','IO1_6','IO1_7']
-    PORT2 = ['IO2_0','IO2_1','IO2_2','IO2_3','IO2_4','IO2_5','IO2_6','IO2_7']
-    PORT3 = ['IO3_0','IO3_1','IO3_2','IO3_3','IO3_4','IO3_5','IO3_6','IO3_7']
-    PORT4 = ['IO4_0','IO4_1','IO4_2','IO4_3','IO4_4','IO4_5','IO4_6','IO4_7']
+    PORT0 = ['IO0_0', 'IO0_1', 'IO0_2', 'IO0_3', 'IO0_4', 'IO0_5', 'IO0_6', 'IO0_7']
+    PORT1 = ['IO1_0', 'IO1_1', 'IO1_2', 'IO1_3', 'IO1_4', 'IO1_5', 'IO1_6', 'IO1_7']
+    PORT2 = ['IO2_0', 'IO2_1', 'IO2_2', 'IO2_3', 'IO2_4', 'IO2_5', 'IO2_6', 'IO2_7']
+    PORT3 = ['IO3_0', 'IO3_1', 'IO3_2', 'IO3_3', 'IO3_4', 'IO3_5', 'IO3_6', 'IO3_7']
+    PORT4 = ['IO4_0', 'IO4_1', 'IO4_2', 'IO4_3', 'IO4_4', 'IO4_5', 'IO4_6', 'IO4_7']
     PCA9698_BASE_INPUT = 0x00
     PCA9698_PORT0_INPUT = 0x00
     PCA9698_PORT1_INPUT = 0x01
@@ -80,7 +80,7 @@ class PCA9698:
         pvalue = self.get_register(register, ~mask)
         self.set_register(register, pvalue | (int(on) << bit))
 
-    def get_port_index(self, gpio: Union[str,int]) -> int:
+    def get_port_index(self, gpio: Union[str, int]) -> int:
         ''' Get port index for given gpio. '''
         if isinstance(gpio, str):
             if gpio in PCA9698.PORT0:
@@ -97,7 +97,7 @@ class PCA9698:
             return int(gpio / 8)
         raise ValueError(f'GPIO {gpio} is not a valid value')
 
-    def get_gpio_bit_position(self, gpio: Union[str,int]) -> int:
+    def get_gpio_bit_position(self, gpio: Union[str, int]) -> int:
         ''' Get register bit position for given gpio. '''
         if isinstance(gpio, str):
             if gpio in PCA9698.PORT0:
@@ -114,45 +114,45 @@ class PCA9698:
             return int(gpio % 8)
         raise ValueError(f'GPIO {gpio} is not a valid value')
 
-    def get_gpio_direction(self, gpio: Union[str,int]) -> GPIODir:
+    def get_gpio_direction(self, gpio: Union[str, int]) -> GPIODir:
         ''' Get GPIO direction as either in or out. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         value = self.get_register_bit(self.PCA9698_BASE_CONFIG + port_index, gpio_bit)
         return GPIODir.IN if value else GPIODir.OUT
 
-    def set_gpio_direction(self, gpio: Union[str,int], gpio_dir: GPIODir):
+    def set_gpio_direction(self, gpio: Union[str, int], gpio_dir: GPIODir):
         ''' Set GPIO direction as either in or out. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         value = gpio_dir == GPIODir.IN
         self.set_register_bit(self.PCA9698_BASE_CONFIG + port_index, gpio_bit, value)
 
-    def get_gpio_input(self, gpio: Union[str,int]) -> bool:
+    def get_gpio_input(self, gpio: Union[str, int]) -> bool:
         ''' Read GPIO input value.'''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         return self.get_register_bit(self.PCA9698_BASE_INPUT + port_index, gpio_bit)
 
-    def get_gpio_output(self, gpio: Union[str,int]) -> bool:
+    def get_gpio_output(self, gpio: Union[str, int]) -> bool:
         ''' Get currently set GPIO output value.'''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         return self.get_register_bit(self.PCA9698_BASE_OUTPUT + port_index, gpio_bit)
 
-    def set_gpio_output(self, gpio: Union[str,int], high: Union[bool, int]):
+    def set_gpio_output(self, gpio: Union[str, int], high: Union[bool, int]):
         ''' Pull GPIO output either active high or low.'''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         self.set_register_bit(self.PCA9698_BASE_OUTPUT + port_index, gpio_bit, bool(high))
 
-    def get_gpio_polarity(self, gpio: Union[str,int]):
+    def get_gpio_polarity(self, gpio: Union[str, int]):
         ''' Get GPIO polarity setting. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
         return self.get_register_bit(self.PCA9698_BASE_POLARITY + port_index, gpio_bit)
 
-    def set_gpio_polarity(self, gpio: Union[str,int], flipped: bool):
+    def set_gpio_polarity(self, gpio: Union[str, int], flipped: bool):
         ''' Set GPIO polarity setting as either normal or flipped. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
