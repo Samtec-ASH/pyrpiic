@@ -1,8 +1,9 @@
 import array
 import time
-from typing import Optional, Union
+from enum import Enum
 from pyrpio.i2c_register_device import I2CRegisterDevice
 from pyrpio.i2c import I2C
+
 
 # I2C Address
 HDC1080_ADDRESS = (0x40)    # 1000000
@@ -35,6 +36,14 @@ HDC1080_CONFIG_HUMIDITY_RESOLUTION_8BIT = (0x0200)
 
 
 class HDC1080:
+    class TempResolution(Enum):
+        fourteen = 0
+        eleven = 1
+
+    class HumidityResolution(Enum):
+        fourteen = 0
+        eleven = 1
+        eight = 2
     i2c: I2C
     i2c_reg: I2CRegisterDevice
     address: int
@@ -50,10 +59,11 @@ class HDC1080:
                                           bytes(bytearray([config >> 8, 0x00])))
         time.sleep(0.015)
 
-    def read_temperature(self):
+    def read_temperature(self) -> float:
+        ''' read temperature and return a float '''
         s = bytes(bytearray([HDC1080_TEMPERATURE_REGISTER]))
         self.i2c.write(s)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
 
         data = self.i2c.read(2)  # read 2 byte temperature data
         buf = array.array('B', data)
@@ -64,13 +74,12 @@ class HDC1080:
         cTemp = (temp / 65536.0) * 165.0 - 40
         return cTemp
 
-    def read_humidity(self):
-        # Send humidity measurement command, 0x01(01)
-        time.sleep(0.015)               # From the data sheet
-
+    def read_humidity(self) -> float:
+        ''' read humidity and return a float '''
+        time.sleep(0.015)               # Required delay
         s = bytes(bytearray([HDC1080_HUMIDITY_REGISTER]))
         self.i2c.write(s)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
 
         data = self.i2c.read(2)  # read 2 byte humidity data
         buf = array.array('B', data)
@@ -79,12 +88,11 @@ class HDC1080:
         humidity = (humidity / 65536.0) * 100.0
         return humidity
 
-    def read_config_register(self):
-        # Read config register
-
+    def read_config_register(self) -> int:
+        ''' read configuration register and return integer value '''
         s = bytes(bytearray([HDC1080_CONFIGURATION_REGISTER]))
         self.i2c.write(s)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
 
         data = self.i2c.read(2)  # read 2 byte config data
 
@@ -94,94 +102,87 @@ class HDC1080:
         return buf[0]*256+buf[1]
 
     def turn_heater_on(self):
-        # Read config register
+        ''' turn heater on '''
         config = self.read_config_register()
         config = config | HDC1080_CONFIG_HEATER_ENABLE
         s = [HDC1080_CONFIGURATION_REGISTER, config >> 8, 0x00]
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)  # sending config register bytes
-        time.sleep(0.015)               # From the data sheet
-
-        return
+        time.sleep(0.015)               # Required delay
 
     def turn_heater_off(self):
-        # Read config register
+        ''' turn heater off '''
         config = self.read_config_register()
         config = config & ~HDC1080_CONFIG_HEATER_ENABLE
         s = [HDC1080_CONFIGURATION_REGISTER, config >> 8, 0x00]
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)  # sending config register bytes
-        time.sleep(0.015)               # From the data sheet
+        time.sleep(0.015)               # Required delay
 
-        return
-
-    def set_humidity_resolution(self, resolution):
-        # Read config register
+    def set_humidity_resolution(self, resolution: HumidityResolution):
+        ''' set humidity resolution [0 - 14bit, 1 - 11bit, 2 - 8bit ] '''
         config = self.read_config_register()
-        config = (config & ~0x0300) | resolution
+        config = (config & ~0x0300) | resolution.value
         s = [HDC1080_CONFIGURATION_REGISTER, config >> 8, 0x00]
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)  # sending config register bytes
-        time.sleep(0.015)               # From the data sheet
-        return
+        time.sleep(0.015)               # Required delay
 
-    def set_temperature_resolution(self, resolution):
-        # Read config register
+    def set_temperature_resolution(self, resolution: TempResolution):
+        ''' set temperature resolution [0 - 14bit, 1 - 11bit ] '''
         config = self.read_config_register()
-        config = (config & ~0x0400) | resolution
+        config = (config & ~0x0400) | resolution.value
 
         s = [HDC1080_CONFIGURATION_REGISTER, config >> 8, 0x00]
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)  # sending config register bytes
-        time.sleep(0.015)               # From the data sheet
+        time.sleep(0.015)               # Required delay
 
-        return
 
-    def read_battery_status(self):
-
-        # Read config register
+    def read_battery_status(self) -> bool:
+        ''' get battery status (bool) ''' 
         config = self.read_config_register()
         config = config & ~ HDC1080_CONFIG_HEATER_ENABLE
 
-        if (config == 0):
+        if config == 0:
             return True
         else:
             return False
 
         return 0
 
-    def read_manufacturer_id(self):
-
+    def read_manufacturer_id(self) -> int:
+        ''' get manufacturuer id (int) ''' 
         s = [HDC1080_MANUFACTURERID_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
 
         data = self.i2c.read(2)  # read 2 byte config data
 
         buf = array.array('B', data)
         return buf[0] * 256 + buf[1]
 
-    def read_device_id(self):
-
+    def read_device_id(self) -> int:
+        ''' get device id (int) ''' 
         s = [HDC1080_DEVICEID_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
 
         data = self.i2c.read(2)  # read 2 byte config data
 
         buf = array.array('B', data)
         return buf[0] * 256 + buf[1]
 
-    def read_serial_number(self):
-
+    def read_serial_number(self) -> int:
+        ''' get device serial number (int) ''' 
         serialNumber = 0
 
         s = [HDC1080_SERIALIDHIGH_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
         data = self.i2c.read(2)  # read 2 byte config data
         buf = array.array('B', data)
         serialNumber = buf[0]*256 + buf[1]
@@ -189,7 +190,7 @@ class HDC1080:
         s = [HDC1080_SERIALIDMID_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
         data = self.i2c.read(2)  # read 2 byte config data)
         buf = array.array('B', data)
         serialNumber = serialNumber*256 + buf[0]*256 + buf[1]
@@ -197,7 +198,7 @@ class HDC1080:
         s = [HDC1080_SERIALIDBOTTOM_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
-        time.sleep(0.0625)              # From the data sheet
+        time.sleep(0.0625)              # Required delay
         data = self.i2c.read(2)  # read 2 byte config data
         buf = array.array('B', data)
         serialNumber = serialNumber*256 + buf[0]*256 + buf[1]
