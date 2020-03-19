@@ -140,19 +140,14 @@ class HDC1080:
 
 
     def read_battery_status(self) -> bool:
-        ''' get battery status (bool) ''' 
+        ''' get battery status (bool) '''
         config = self.read_config_register()
         config = config & ~ HDC1080_CONFIG_HEATER_ENABLE
 
-        if config == 0:
-            return True
-        else:
-            return False
-
-        return 0
+        return bool(config == 0)
 
     def read_manufacturer_id(self) -> int:
-        ''' get manufacturuer id (int) ''' 
+        ''' get manufacturuer id (int) '''
         s = [HDC1080_MANUFACTURERID_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
@@ -164,7 +159,7 @@ class HDC1080:
         return buf[0] * 256 + buf[1]
 
     def read_device_id(self) -> int:
-        ''' get device id (int) ''' 
+        ''' get device id (int) '''
         s = [HDC1080_DEVICEID_REGISTER]  # temp
         s2 = bytes(bytearray(s))
         self.i2c.write(s2)
@@ -176,7 +171,7 @@ class HDC1080:
         return buf[0] * 256 + buf[1]
 
     def read_serial_number(self) -> int:
-        ''' get device serial number (int) ''' 
+        ''' get device serial number (int) '''
         serialNumber = 0
 
         s = [HDC1080_SERIALIDHIGH_REGISTER]  # temp
