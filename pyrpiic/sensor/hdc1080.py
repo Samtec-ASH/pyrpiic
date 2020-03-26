@@ -54,6 +54,7 @@ class HDC1080:
             bus, address, register_size=1, data_size=2)
         time.sleep(0.015)  # 15ms startup time
 
+    def configure(self):
         config = HDC1080_CONFIG_ACQUISITION_MODE
         self.i2c_reg.write_register_bytes(HDC1080_CONFIGURATION_REGISTER,
                                           bytes(bytearray([config >> 8, 0x00])))
@@ -98,7 +99,7 @@ class HDC1080:
 
         buf = array.array('B', data)
 
-        # print "register=%X %X"% (buf[0], buf[1])
+        # print("register={} {}".format(buf[0], buf[1]))
         return buf[0]*256+buf[1]
 
     def turn_heater_on(self):
