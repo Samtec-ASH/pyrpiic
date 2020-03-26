@@ -55,6 +55,7 @@ class HDC1080:
         time.sleep(0.015)  # 15ms startup time
 
     def configure(self):
+        """ configure for acquisition mode """
         config = HDC1080_CONFIG_ACQUISITION_MODE
         self.i2c_reg.write_register_bytes(HDC1080_CONFIGURATION_REGISTER,
                                           bytes(bytearray([config >> 8, 0x00])))
