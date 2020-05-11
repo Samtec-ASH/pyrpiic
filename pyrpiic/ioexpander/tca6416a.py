@@ -123,4 +123,4 @@ class TCA6416A:
         ''' Set GPIO polarity setting as either normal or flipped. '''
         port_index = self.get_port_index(gpio)
         gpio_bit = self.get_gpio_bit_position(gpio)
-        self.set_register_bit(self.TCA6416A_BASE_OUTPUT + port_index, gpio_bit, flipped)
+        self.set_register_bit(self.TCA6416A_BASE_POLARITY + port_index, gpio_bit, flipped)
