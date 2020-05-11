@@ -11,6 +11,7 @@ pylint = "*"
 autopep8 = "*"
 python-periphery = "*"
 pyrpiic = {path = "."}
+bleach = ">=3.1.4"
 v = {editable = true,version = "*"}
 
 [packages]
