@@ -46,7 +46,7 @@ class EEPROM:
             bytes: A single byte at memory address
         '''
         if address > self.__max_bytes:
-            raise EEPROMException(f'Overflows memory max is {self.__max_bytes} Bytes')
+            raise OverflowError(f'Overflows memory max is {self.__max_bytes} Bytes')
         self.__bus.set_address(self.__i2c_address)
         return self.__bus.read_write(address.to_bytes(length=1, byteorder='big'))
 
@@ -134,6 +134,10 @@ class EEPROM:
         value = ""
         offset = 0
         while True:
+            address = start_address + offset
+            if address > self.__max_bytes:
+                value = None
+                raise EOFError('No null character found. Possibly unterminated string or uninitialized memory.')
             sub_value = self.read_sequential_bytes(start_address + offset, self.__page_bytes).decode(encoding)
             if '\0' in sub_value:
                 return value + sub_value[:sub_value.index('\0')]
