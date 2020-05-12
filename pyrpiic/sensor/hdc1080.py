@@ -52,7 +52,7 @@ class HDC1080:
         self.i2c = bus
         self.i2c_reg = I2CRegisterDevice(
             bus, address, register_size=1, data_size=2)
-        time.sleep(1.0)  # 15ms startup time, I find needs longer
+        time.sleep(0.015)  # 15ms startup time 
 
     def configure(self):
         """ configure for acquisition mode """
