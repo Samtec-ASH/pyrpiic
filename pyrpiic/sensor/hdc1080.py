@@ -47,12 +47,13 @@ class HDC1080:
     i2c: I2C
     i2c_reg: I2CRegisterDevice
     address: int
+
     def __init__(self, bus: I2C, address=HDC1080_ADDRESS):
         self.address = address
         self.i2c = bus
         self.i2c_reg = I2CRegisterDevice(
             bus, address, register_size=1, data_size=2)
-        time.sleep(0.015)  # 15ms startup time 
+        time.sleep(0.015)  # 15ms startup time
 
     def configure(self):
         """ configure for acquisition mode """
@@ -148,7 +149,6 @@ class HDC1080:
         self.i2c.set_address(self.address)
         self.i2c.write(s2)  # sending config register bytes
         time.sleep(0.015)               # Required delay
-
 
     def read_battery_status(self) -> bool:
         ''' get battery status (bool) '''

@@ -1,6 +1,6 @@
 # PyRPIIC
 
-⚠️ **WARNING: This is a very early pre-release. Expect things to break.** ⚠️
+![./icon.png](./icon.png)
 
 #### A [Py]thon 3 addon for [R]aspberry [Pi] that enables [i]nterfacing w/ a variety of low-level board [IC]s.
 
