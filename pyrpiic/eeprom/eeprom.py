@@ -138,7 +138,8 @@ class EEPROM:
             if address > self.__max_bytes:
                 value = None
                 raise EOFError('No null character found. Possibly unterminated string or uninitialized memory.')
-            sub_value = self.read_sequential_bytes(start_address + offset, self.__page_bytes).decode(encoding)
+            data = self.read_sequential_bytes(start_address + offset, self.__page_bytes)
+            sub_value = data.decode(encoding, errors='ignore')
             if '\0' in sub_value:
                 return value + sub_value[:sub_value.index('\0')]
             value += sub_value
